@@ -459,21 +459,45 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
+<script>
+    // ... existing code ...
 
-        uploadButton.addEventListener('click', function() {
-            // Here you would typically handle the file upload to your backend
-            // For now, we'll just simulate the process
-            uploadButton.textContent = 'Processing...';
-            uploadButton.disabled = true;
+    uploadButton.addEventListener('click', function() {
+        if (fileInput.files.length === 0) return;
 
-            // Simulate processing delay
-            setTimeout(() => {
-                uploadButton.textContent = 'Analyze EEG Data';
-                uploadButton.disabled = false;
-                alert('Files processed successfully! (This is a simulation)');
-            }, 2000);
+        const formData = new FormData();
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('files[]', fileInput.files[i]);
+        }
+
+        uploadButton.textContent = 'Processing...';
+        uploadButton.disabled = true;
+
+        fetch('http://localhost:5000/api/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            uploadButton.textContent = 'Analyze EEG Data';
+            uploadButton.disabled = false;
+
+            if (data.status === 'success') {
+                // Handle successful processing
+                console.log('Processing results:', data.results);
+                alert('Files processed successfully!');
+                // You can display the features or visualization here
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            uploadButton.textContent = 'Analyze EEG Data';
+            uploadButton.disabled = false;
+            console.error('Error:', error);
+            alert('An error occurred while processing the files.');
         });
-
+    });
         // Check for saved theme preference
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
