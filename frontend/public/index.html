@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
     <!-- Meta Tags -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="EEG Analysis and Visualization Platform" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="EEG Analysis and Visualization Platform">
     <title>EEG Analysis Platform</title>
     <!-- Styles -->
     <link rel="stylesheet" href="index.css">
@@ -18,9 +19,9 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#about" class="nav-link">About</a>
             <a href="#" class="nav-link">Documentation</a>
-            <a href="https://github.com/your-repo" class="nav-link" target="_blank">Repository</a>
-            <a href="https://notion.so/your-lab" class="nav-link" target="_blank">Lab Homepage</a>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <a href="https://github.com/your-repo" class="nav-link" target="_blank" rel="noopener">Repository</a>
+            <a href="https://notion.so/your-lab" class="nav-link" target="_blank" rel="noopener">Lab Homepage</a>
+            <button class="theme-toggle" type="button" onclick="toggleTheme()">🌓</button>
         </div>
     </nav>
 
@@ -29,31 +30,67 @@
         <div class="hero-overlay">
             <h1 class="hero-title">Unlock Insights from EEG Data</h1>
             <p class="hero-subtitle">A powerful tool for EEG data analysis and visualization</p>
+            <div class="hero-features">
+                <div class="hero-feature">
+                    <span class="hero-feature-icon">📊</span>
+                    <p>Advanced Analytics</p>
+                </div>
+                <div class="hero-feature">
+                    <span class="hero-feature-icon">🧠</span>
+                    <p>Brain Mapping</p>
+                </div>
+                <div class="hero-feature">
+                    <span class="hero-feature-icon">🔬</span>
+                    <p>Research-Grade Tools</p>
+                </div>
+            </div>
             <a href="#upload" class="cta-button">Get Started</a>
+            <p class="hero-scroll-prompt">Scroll to learn more</p>
         </div>
     </section>
 
     <!-- Features Section -->
     <section class="features-section" id="features">
         <h2 class="features-title">Features</h2>
-        <div class="features-grid">
-            <div class="feature-item">
-                <div class="feature-icon">⚡</div>
-                <h3 class="feature-title">Fast Processing</h3>
-                <p class="feature-description">Experience rapid EEG data analysis with our optimized algorithms.</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">📈</div>
-                <h3 class="feature-title">Detailed Visualization</h3>
-                <p class="feature-description">Get comprehensive visual representations of your EEG data.</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon">🔒</div>
-                <h3 class="feature-title">Secure Data</h3>
-                <p class="feature-description">Your data privacy is our top priority with end-to-end encryption.</p>
-            </div>
+        <div class="features-grid" id="featuresGrid">
+            <!-- Features will be dynamically added here -->
         </div>
     </section>
+
+    <script>
+        // Array of features
+        const features = [
+            { icon: '⚡', title: 'Fast Processing', description: 'Experience rapid EEG data analysis with our optimized algorithms.' },
+            { icon: '📈', title: 'Detailed Visualization', description: 'Get comprehensive visual representations of your EEG data.' },
+            { icon: '🔒', title: 'Secure Data', description: 'Your data privacy is our top priority with end-to-end encryption.' },
+            { icon: '🔍', title: 'Advanced Analytics', description: 'Utilize cutting-edge analytical tools for in-depth EEG analysis.' },
+            { icon: '🧠', title: 'Brain Mapping', description: 'Visualize brain activity with our advanced mapping techniques.' },
+            { icon: '📱', title: 'Mobile Friendly', description: 'Access your EEG data and analysis on any device, anywhere.' }
+        ];
+
+        // Function to create a feature item
+        function createFeatureItem(feature) {
+            const featureItem = document.createElement('div');
+            featureItem.className = 'feature-item';
+            featureItem.innerHTML = `
+                <div class="feature-icon">${feature.icon}</div>
+                <h3 class="feature-title">${feature.title}</h3>
+                <p class="feature-description">${feature.description}</p>
+            `;
+            return featureItem;
+        }
+
+        // Function to populate features
+        function populateFeatures() {
+            const featuresGrid = document.getElementById('featuresGrid');
+            features.forEach(feature => {
+                featuresGrid.appendChild(createFeatureItem(feature));
+            });
+        }
+
+        // Call the function when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', populateFeatures);
+    </script>
 
     <!-- About Section -->
     <section class="about-section" id="about">
@@ -71,16 +108,17 @@
         <div class="upload-section">
             <div class="file-upload">
                 <div class="file-input-wrapper" id="dropZone">
-                    <input type="file" class="file-input" id="fileInput" accept=".eeg,.edf,.bdf,.gdf,.set" multiple />
+                    <label for="fileInput" class="visually-hidden">Upload EEG files</label>
+                    <input type="file" class="file-input" id="fileInput" accept=".eeg,.edf,.bdf,.gdf,.set" multiple aria-describedby="fileUploadDescription" />
                     <div class="upload-icon">📁</div>
                     <div class="upload-text">
                         <strong>Drop your EEG files here</strong>
                         <p>or click to select files</p>
-                        <small>Supported formats: .eeg, .edf, .bdf, .gdf, .set</small>
+                        <small id="fileUploadDescription">Supported formats: .eeg, .edf, .bdf, .gdf, .set</small>
                     </div>
                 </div>
                 <div class="file-info" id="fileInfo"></div>
-                <button class="upload-button" id="uploadButton" disabled>
+                <button class="upload-button" id="uploadButton" type="button" disabled>
                     Analyze EEG Data
                 </button>
                 <div class="file-list" id="fileList"></div>
@@ -90,11 +128,74 @@
 
     <!-- Footer -->
     <footer class="footer">
-        &copy; 2023 EEG Analysis Platform. All rights reserved.
+        <div class="footer-content">
+            <p>&copy; 2023 EEG Analysis Platform. All rights reserved.</p>
+            <p>Developed by <a href="https://github.com/Exios66" target="_blank" rel="noopener noreferrer">Exios66</a></p>
+        </div>
+        <div class="footer-links">
+            <a href="https://github.com/Exios66" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="#about">About</a>
+            <a href="#upload">Upload</a>
+        </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="index.js"></script>
+    <script src="%PUBLIC_URL%/index.js"></script>
+    <script src="%PUBLIC_URL%/vendor/chart.js"></script>
+    <script src="%PUBLIC_URL%/vendor/three.min.js"></script>
+    <script src="%PUBLIC_URL%/vendor/axios.min.js"></script>
+    <!-- Load core dependencies -->
+    <script src="%PUBLIC_URL%/vendor/react.production.min.js"></script>
+    <script src="%PUBLIC_URL%/vendor/react-dom.production.min.js"></script>
+
+    <!-- Load UI framework -->
+    <script src="%PUBLIC_URL%/vendor/material-ui.production.min.js"></script>
+
+    <!-- Load data visualization libraries -->
+    <script src="%PUBLIC_URL%/vendor/chart.js"></script>
+    <script src="%PUBLIC_URL%/vendor/three.min.js"></script>
+
+    <!-- Load HTTP client -->
+    <script src="%PUBLIC_URL%/vendor/axios.min.js"></script>
+
+    <!-- Load custom scripts -->
+    <script src="%PUBLIC_URL%/index.js"></script>
+
+    <!-- Dynamically load additional scripts -->
+    <script>
+        const additionalScripts = [
+            { src: '%PUBLIC_URL%/vendor/react-chartjs-2.min.js', condition: true },
+            { src: '%PUBLIC_URL%/vendor/web-vitals.js', condition: process.env.NODE_ENV === 'development' },
+            // Add more scripts as needed
+        ];
+
+        additionalScripts.forEach(script => {
+            if (script.condition) {
+                const scriptElement = document.createElement('script');
+                scriptElement.src = script.src;
+                document.body.appendChild(scriptElement);
+            }
+        });
+    </script>
+    <script>
+        // Dynamically load additional scripts if needed
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.body.appendChild(script);
+            });
+        }
+
+        // Example of dynamically loading a script based on a condition
+        if (someCondition) {
+            loadScript('%PUBLIC_URL%/additional-script.js')
+                .then(() => console.log('Additional script loaded'))
+                .catch(error => console.error('Error loading additional script:', error));
+        }
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
 </body>
 </html>
