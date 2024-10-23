@@ -1,0 +1,4 @@
+Start_Time,End_Time,Type,Channel
+0.5,1.0,Blink,Fp1
+2.5,3.0,Movement,All
+4.5,5.0,Muscle,C3

@@ -1,0 +1,9 @@
+Channel,Type,Unit,Reference
+Fp1,EEG,uV,Cz
+Fp2,EEG,uV,Cz
+F3,EEG,uV,Cz
+F4,EEG,uV,Cz
+C3,EEG,uV,Cz
+C4,EEG,uV,Cz
+O1,EEG,uV,Cz
+O2,EEG,uV,Cz

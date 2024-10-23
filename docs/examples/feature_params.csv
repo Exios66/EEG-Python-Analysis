@@ -1,0 +1,6 @@
+Feature,Min_Freq,Max_Freq,Method
+delta,0.5,4,bandpower
+theta,4.0,8,bandpower
+alpha,8.0,13,bandpower
+beta,13.0,30,bandpower
+gamma,30.0,45,bandpower

@@ -1,0 +1,5 @@
+Parameter,Value,Unit
+lowcut,1.0,Hz
+highcut,40.0,Hz
+notch_freq,50.0,Hz
+resample_freq,256.0,Hz
