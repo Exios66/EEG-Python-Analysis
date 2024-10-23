@@ -1,24 +1,16 @@
-import { calculateDynamicTextColor } from '../utils/colorUtils';
-import { useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useContext } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
 
-function ThemeToggle() {
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+export function ThemeToggle() {
+  const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
 
-  const toggleTheme = () => {
-    setIsDarkTheme(!isDarkTheme);
-    const newBackgroundColor = !isDarkTheme ? '#1a1a1a' : '#ffffff';
-    document.documentElement.style.setProperty('--background-color', newBackgroundColor);
-    
-    const rgb = hexToRgb(newBackgroundColor);
-    document.documentElement.style.setProperty('--background-color-r', rgb.r);
-    document.documentElement.style.setProperty('--background-color-g', rgb.g);
-    document.documentElement.style.setProperty('--background-color-b', rgb.b);
-
-    const dynamicTextColor = calculateDynamicTextColor(newBackgroundColor);
-    document.documentElement.style.setProperty('--dynamic-text-color', dynamicTextColor);
-
-    document.body.classList.toggle('dark-theme');
-  };
-
-  // Rest of the component code...
+  return (
+    <button
+      onClick={toggleTheme}
+      className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700"
+    >
+      {isDarkTheme ? '🌙' : '☀️'}
+    </button>
+  );
 }

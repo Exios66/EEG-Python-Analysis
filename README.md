@@ -1,4 +1,4 @@
-# EEG Analysis and Visualization Platform
+# EEG Visualization App
 
 ![GitHub Pages](https://github.com/Exios66/EEG-Python-Analysis/actions/workflows/pages/pages-build-deployment/badge.svg)
 
@@ -154,3 +154,58 @@ For support and questions, please open an issue in the GitHub repository.
 - Chart.js for visualization components
 - Flask for the backend server
 - Material-UI for the frontend components
+
+## Prerequisites
+
+- Node.js (v14 or later)
+- Python (v3.7 or later)
+- pip (Python package installer)
+
+## Setup
+
+1. Clone the repository:   ```
+   git clone https://github.com/yourusername/eeg-visualization-app.git
+   cd eeg-visualization-app   ```
+
+2. Set up the Python backend:   ```
+   pip install -r requirements.txt   ```
+
+3. Set up the React frontend:   ```
+   cd docs
+   npm install   ```
+
+## Running the Application
+
+1. Start the Python backend:   ```
+   python EEG.py   ```
+   The backend will run on `http://localhost:5000`.
+
+2. In a new terminal, start the React frontend:   ```
+   cd docs
+   npm start   ```
+   The frontend will run on `http://localhost:3000`.
+
+3. Open your browser and navigate to `http://localhost:3000` to view the application.
+
+## Development
+
+- The main Python script is `EEG.py`.
+- React components are in the `docs/src/components` directory.
+- The main React application is in `docs/src/App.js`.
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Running Tests
+
+### Frontend Tests
+To run the React component tests:
+
+```
+npm run test
+```

@@ -1,2 +1,5 @@
 flask-jwt-extended==4.4.4
-flask-limiter==2.0.0
+
+Flask==2.0.1
+Flask-CORS==3.0.10
+numpy==1.21.0flask-limiter==2.0.0
