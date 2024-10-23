@@ -28,9 +28,9 @@ ChartJS.register(
 
 const VisualizationPanel = ({ results }) => {
   const [selectedTab, setSelectedTab] = React.useState(0);
-  const { backgroundColor, textColor, accentColor } = useThemeColors();
+  const { backgroundColor, textColor } = useThemeColors();
 
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (_event, newValue) => {
     setSelectedTab(newValue);
   };
 
@@ -66,7 +66,7 @@ const VisualizationPanel = ({ results }) => {
     };
 
     return (
-      <Box sx={{ height: 400 }}>
+      <Box sx={{ height: 400, backgroundColor: backgroundColor, color: textColor }}>
         <Bar data={data} options={options} />
       </Box>
     );
@@ -104,7 +104,7 @@ const VisualizationPanel = ({ results }) => {
     };
 
     return (
-      <Box sx={{ height: 400 }}>
+      <Box sx={{ height: 400, backgroundColor: backgroundColor, color: textColor }}>
         <Line data={data} options={options} />
       </Box>
     );
