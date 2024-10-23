@@ -26,7 +26,13 @@
     "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**/*.{js,jsx}",
+    "lint:fix": "eslint --fix src/**/*.{js,jsx}",
+    "format": "prettier --write src/**/*.{js,jsx,css,scss}",
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "deploy": "npm run build && npm run analyze && netlify deploy --prod",
+    "ci": "npm run lint && npm test && npm run build"
   },
   "eslintConfig": {
     "extends": [
