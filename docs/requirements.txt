@@ -1,39 +1,22 @@
-# Install all requirements in the docs subfolder
--r ../requirements.txt
-
-# Additional frontend-specific requirements
-# Core data processing
-numpy>=1.21.0
-pandas>=1.3.0
-scipy>=1.7.0
-
-# Machine learning
-scikit-learn>=0.24.0
-
-# EEG processing
-mne>=0.23.0
-
-# Web framework and API
-flask>=2.0.0
-flask-cors>=3.0.0
-flask-limiter>=2.0.0
-flask-jwt-extended>=4.0.0
-werkzeug>=2.0.0
-
-# Monitoring and metrics
-prometheus-client>=0.11.0
-psutil>=5.8.0
-
-# Data formats and serialization
-pyyaml>=5.4.0
-joblib>=1.0.0
-
-# Caching
-redis>=3.5.0
-
-# Visualization
-matplotlib>=3.4.0
-
-# Documentation
-# Install Sphinx and all extensions
-sphinx>=4.0.0 sphinx-rtd-theme>=0.5.0 sphinx-autodoc-typehints>=1.12.0 sphinxcontrib-httpdomain>=1.8.0 sphinx sphinx-rtd-theme sphinx-autobuild sphinxcontrib-napoleon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-htmlhelp sphinxcontrib-jsmath sphinxcontrib-qthelp sphinxcontrib-serializinghtml
+Flask==2.2.5
+Flask-CORS==4.0.0
+Flask-JWT-Extended==4.5.2
+Flask-Limiter==3.3.1
+numpy>=1.24.3
+pandas>=2.0.3
+scipy>=1.11.2
+matplotlib==3.7.1
+seaborn==0.12.2
+scikit-learn==1.3.0
+mne==1.5.1
+plotly==5.15.0
+dash==2.9.3
+dash-bootstrap-components==1.4.1
+gunicorn>=21.2.0
+python-dotenv>=1.0.0
+flask-socketio==5.3.6
+python-socketio==5.8.0
+eventlet>=0.33.3
+redis>=5.0.1
+pyyaml>=6.0.1
+prometheus-client>=0.17.1

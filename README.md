@@ -164,8 +164,8 @@ For support and questions, please open an issue in the GitHub repository.
 ## Setup
 
 1. Clone the repository:   ```
-   git clone https://github.com/yourusername/eeg-visualization-app.git
-   cd eeg-visualization-app   ```
+   git clone https://github.com/Exios66/EEG-Python-Analysis.git
+   cd EEG-Python-Analysis   ```
 
 2. Set up the Python backend:   ```
    pip install -r requirements.txt   ```

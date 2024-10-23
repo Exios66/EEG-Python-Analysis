@@ -1,0 +1,58 @@
+import numpy as np
+import pandas as pd
+import os
+from datetime import datetime
+
+# Function to create a unique subfolder
+def create_unique_subfolder(base_path):
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    existing_folders = [f for f in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, f))]
+    existing_ids = [int(f.split('_')[0]) for f in existing_folders if f.split('_')[0].isdigit()]
+    new_id = max(existing_ids or [0]) + 1
+    subfolder_name = f"{new_id:03d}_{timestamp}"
+    subfolder_path = os.path.join(base_path, subfolder_name)
+    os.makedirs(subfolder_path, exist_ok=True)
+    return subfolder_path
+
+# Get the current script's directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Navigate to the docs/examples folder
+base_examples_path = os.path.abspath(os.path.join(current_dir, '..'))
+
+# Create a unique subfolder for this run
+output_folder = create_unique_subfolder(base_examples_path)
+
+np.random.seed(42)  # For reproducibility
+
+# Generate synthetic personality test data
+def generate_personality_data(n_participants=1000, n_items=50):
+    data = np.random.randint(1, 6, size=(n_participants, n_items))
+    columns = [f'Item_{i+1}' for i in range(n_items)]
+    df = pd.DataFrame(data, columns=columns)
+    df['Participant_ID'] = range(1, n_participants + 1)
+    return df
+
+personality_data = generate_personality_data()
+personality_data.to_csv(os.path.join(output_folder, 'personality_test_data.csv'), index=False)
+
+# Generate synthetic cognitive test scores
+n_participants = 500
+cognitive_data = pd.DataFrame({
+    'Participant_ID': range(1, n_participants + 1),
+    'Verbal_Reasoning': np.random.normal(100, 15, n_participants),
+    'Numerical_Reasoning': np.random.normal(100, 15, n_participants),
+    'Abstract_Reasoning': np.random.normal(100, 15, n_participants),
+    'Processing_Speed': np.random.normal(100, 15, n_participants)
+})
+cognitive_data.to_csv(os.path.join(output_folder, 'cognitive_test_data.csv'), index=False)
+
+# Generate psychometric calculator example data
+n_scores = 100
+psychometric_scores = np.random.normal(75, 10, n_scores).round(2)
+pd.DataFrame({'Scores': psychometric_scores}).to_csv(os.path.join(output_folder, 'psychometric_calculator_data.csv'), index=False)
+
+print(f"All psychological test data files have been created in the '{output_folder}' directory.")
+print("\nExample data for Psychometric Calculator:")
+print(f"Scores: {', '.join(map(str, psychometric_scores[:10]))}")
+print("(showing first 10 scores)")

@@ -6,9 +6,11 @@ import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import { SnackbarProvider, useSnackbar } from 'notistack';
 import io from 'socket.io-client';
-import { Box, Container, Typography, Button } from '@mui/material';
+import { Box, Container, Typography, Button, Tabs, Tab } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import PsychometricCalculator from './components/PsychometricCalculator';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const SOCKET_RECONNECTION_ATTEMPTS = 5;
@@ -34,6 +36,7 @@ function AppContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [reconnectionAttempts, setReconnectionAttempts] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
+  const [activeTab, setActiveTab] = useState(0);
 
   const initializeSocket = useCallback(() => {
     try {
@@ -168,69 +171,89 @@ function AppContent() {
     }
   }, [socket, eegData, enqueueSnackbar]);
 
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   return (
     <ThemeProvider>
-      <Container maxWidth="xl" className="min-h-screen bg-white dark:bg-gray-900">
-        <Box component="header" className="p-6 flex justify-between items-center">
-          <Typography variant="h4" component="h1" className="font-bold">
-            EEG Visualization Platform
-          </Typography>
-          <ThemeToggle />
-        </Box>
-
-        <Box component="main" className="p-6">
-          <Box className="flex flex-col gap-4 mb-6">
-            <Button
-              component="label"
-              variant="contained"
-              startIcon={<CloudUploadIcon />}
-              disabled={isLoading}
-            >
-              Upload EEG File
-              <VisuallyHiddenInput
-                type="file"
-                onChange={handleFileUpload}
-                accept=".edf,.bdf,.gdf"
-                disabled={isLoading}
-              />
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={processEEG}
-              disabled={isLoading || isProcessing || !eegData}
-              className="mt-4"
-            >
-              Process EEG Data
-            </Button>
+      <Router>
+        <Container maxWidth="xl" className="min-h-screen bg-white dark:bg-gray-900">
+          <Box component="header" className="p-6 flex justify-between items-center">
+            <Typography variant="h4" component="h1" className="font-bold">
+              EEG Visualization Platform
+            </Typography>
+            <ThemeToggle />
           </Box>
 
-          {isLoading && <LoadingSpinner message="Uploading file..." />}
-          
-          {error && (
-            <Typography color="error" className="my-4">
-              {error}
-            </Typography>
-          )}
+          <Box component="nav" className="mb-6">
+            <Tabs value={activeTab} onChange={handleTabChange} centered>
+              <Tab label="EEG Analysis" component={Link} to="/" />
+              <Tab label="Psychometric Calculator" component={Link} to="/psychometric" />
+            </Tabs>
+          </Box>
 
-          {!isLoading && !error && (
-            <Box className="mt-6">
-              {eegData ? (
-                <ErrorBoundary>
-                  <VisualizationPanel 
-                    data={eegData}
-                    isProcessing={isProcessing}
-                  />
-                </ErrorBoundary>
-              ) : (
-                <Typography variant="body1" className="text-center">
-                  Upload an EEG file to begin visualization
-                </Typography>
-              )}
-            </Box>
-          )}
-        </Box>
-      </Container>
+          <Box component="main" className="p-6">
+            <Switch>
+              <Route exact path="/">
+                <Box className="flex flex-col gap-4 mb-6">
+                  <Button
+                    component="label"
+                    variant="contained"
+                    startIcon={<CloudUploadIcon />}
+                    disabled={isLoading}
+                  >
+                    Upload EEG File
+                    <VisuallyHiddenInput
+                      type="file"
+                      onChange={handleFileUpload}
+                      accept=".edf,.bdf,.gdf"
+                      disabled={isLoading}
+                    />
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    onClick={processEEG}
+                    disabled={isLoading || isProcessing || !eegData}
+                    className="mt-4"
+                  >
+                    Process EEG Data
+                  </Button>
+                </Box>
+
+                {isLoading && <LoadingSpinner message="Uploading file..." />}
+                
+                {error && (
+                  <Typography color="error" className="my-4">
+                    {error}
+                  </Typography>
+                )}
+
+                {!isLoading && !error && (
+                  <Box className="mt-6">
+                    {eegData ? (
+                      <ErrorBoundary>
+                        <VisualizationPanel 
+                          data={eegData}
+                          isProcessing={isProcessing}
+                        />
+                      </ErrorBoundary>
+                    ) : (
+                      <Typography variant="body1" className="text-center">
+                        Upload an EEG file to begin visualization
+                      </Typography>
+                    )}
+                  </Box>
+                )}
+              </Route>
+              <Route path="/psychometric">
+                <PsychometricCalculator />
+              </Route>
+            </Switch>
+          </Box>
+        </Container>
+      </Router>
     </ThemeProvider>
   );
 }
