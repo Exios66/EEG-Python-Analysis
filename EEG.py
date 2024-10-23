@@ -32,10 +32,24 @@ import queue
 import time
 from pathlib import Path
 import matplotlib.pyplot as plt
+from werkzeug.utils import secure_filename
 
 # Initialize Flask app for API
 app = Flask(__name__)
 CORS(app)
+
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'eeg', 'edf', 'bdf', 'gdf', 'set'}
+
+# Create uploads directory if it doesn't exist
+UPLOAD_FOLDER = 'uploads'
+Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    """Check if the file has an allowed extension."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 class EEGProcessor:
     def __init__(self):
@@ -49,17 +63,13 @@ class EEGProcessor:
     def load_eeg_data(self, file_path, file_type='auto'):
         """
         Load EEG data using MNE with extended format support.
-        
-        Parameters:
-        - file_path: str, path to the EEG data file
-        - file_type: str, type of the EEG file
         """
         try:
             if file_type == 'auto':
                 self.raw = mne.io.read_raw(file_path, preload=True, verbose=False)
             else:
-                self.raw = mne.io.read_raw(file_path, preload=True, verbose=False, 
-                                         file_type=file_type)
+                self.raw = mne.io.read_raw(file_path, preload=True, verbose=False,
+                                           file_type=file_type)
             return True
         except Exception as e:
             print(f"Error loading EEG data: {e}")
@@ -68,11 +78,6 @@ class EEGProcessor:
     def preprocess_data(self, l_freq=1.0, h_freq=40.0, notch_freq=50.0):
         """
         Comprehensive preprocessing pipeline.
-        
-        Parameters:
-        - l_freq: float, lower frequency bound
-        - h_freq: float, upper frequency bound
-        - notch_freq: float, frequency to notch filter (usually power line noise)
         """
         try:
             # Apply bandpass filter
@@ -104,9 +109,9 @@ class EEGProcessor:
         """
         try:
             # Calculate power spectral density
-            psd, freqs = mne.time_frequency.psd_welch(self.filtered_data, 
-                                                     fmin=1, fmax=40,
-                                                     n_fft=2048)
+            psd, freqs = mne.time_frequency.psd_welch(self.filtered_data,
+                                                      fmin=1, fmax=40,
+                                                      n_fft=2048)
             
             # Extract band powers
             bands = {
@@ -142,7 +147,7 @@ class EEGProcessor:
             
             for i in range(n_channels):
                 for j in range(n_channels):
-                    connectivity[i,j] = np.corrcoef(data[i,:], data[j,:])[0,1]
+                    connectivity[i, j] = np.corrcoef(data[i, :], data[j, :])[0, 1]
             
             return connectivity.tolist()
         except Exception as e:
@@ -167,9 +172,6 @@ class EEGProcessor:
     def export_results(self, output_dir):
         """
         Export analysis results to various formats.
-        
-        Parameters:
-        - output_dir: str, directory to save results
         """
         try:
             output_path = Path(output_dir)
@@ -198,7 +200,7 @@ class EEGProcessor:
 # Flask API routes
 @app.route('/api/process', methods=['POST'])
 def process_eeg():
-    """API endpoint to process EEG data."""
+    """API endpoint to process EEG data from a given file path."""
     try:
         processor = EEGProcessor()
         file_path = request.json['file_path']
@@ -221,14 +223,58 @@ def process_eeg():
             'message': str(e)
         }), 500
 
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    """API endpoint to handle file uploads from the frontend."""
+    try:
+        if 'files[]' not in request.files:
+            return jsonify({'status': 'error', 'message': 'No files part in the request'}), 400
+
+        files = request.files.getlist('files[]')
+        if not files:
+            return jsonify({'status': 'error', 'message': 'No files selected'}), 400
+
+        results = []
+
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+
+                # Process the file
+                processor = EEGProcessor()
+                if processor.load_eeg_data(file_path):
+                    processor.preprocess_data()
+                    processor.extract_features()
+                    # Optionally, you can export the results
+                    # processor.export_results(output_dir)
+
+                    results.append({
+                        'filename': filename,
+                        'features': processor.features
+                    })
+                else:
+                    results.append({
+                        'filename': filename,
+                        'error': 'Failed to process EEG data'
+                    })
+            else:
+                results.append({
+                    'filename': file.filename,
+                    'error': 'File type not allowed'
+                })
+
+        return jsonify({'status': 'success', 'results': results})
+    except Exception as e:
+        print(f"Error in file upload: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 def start_api_server(port=5000):
     """Start the Flask API server."""
     app.run(host='0.0.0.0', port=port)
 
 if __name__ == "__main__":
-    # Start API server in a separate thread
-    api_thread = threading.Thread(target=start_api_server)
-    api_thread.daemon = True
-    api_thread.start()
-    
+    # Start API server
+    start_api_server()
     print("EEG Analysis System initialized and ready for processing.")
