@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, LinearProgress, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const Input = styled('input')({
   display: 'none',
@@ -48,7 +47,6 @@ const DataUpload = ({ onDataUpload }) => {
         <Button
           variant="contained"
           component="span"
-          startIcon={<CloudUploadIcon />}
           disabled={uploading}
         >
           Upload EEG Data
