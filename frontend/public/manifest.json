@@ -3,6 +3,27 @@
   "name": "EEG Analysis and Visualization Platform",
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1e90ff",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "description": "A powerful tool for EEG data analysis and visualization",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en-US"
 }

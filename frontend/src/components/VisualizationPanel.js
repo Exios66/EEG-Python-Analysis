@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Paper, Tab, Tabs } from '@mui/material';
 import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,8 +11,8 @@ import {
   Title,
   Tooltip,
   Legend
-} from 'chart.js';
-import 'chartjs-plugin-colorschemes';
+} from 'chart.js/auto';
+import { getRandomColor } from '../utils/colorUtils';
 
 ChartJS.register(
   CategoryScale,
@@ -41,7 +41,7 @@ const VisualizationPanel = ({ results }) => {
     const datasets = channels.map((channel, idx) => ({
       label: channel,
       data: Object.keys(bandPowers).map(band => bandPowers[band][idx]),
-      backgroundColor: `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.5)`,
+      backgroundColor: getRandomColor(Object.keys(bandPowers).length),
     }));
 
     const data = {
@@ -60,9 +60,6 @@ const VisualizationPanel = ({ results }) => {
           display: true,
           text: 'EEG Band Powers per Channel'
         },
-        colorschemes: {
-          scheme: 'brewer.Paired12'
-        }
       }
     };
 
