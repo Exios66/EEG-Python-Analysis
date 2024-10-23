@@ -8,7 +8,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid
+  Grid,
+  TextField,
+  Checkbox,
+  FormControlLabel
 } from '@mui/material';
 import axios from 'axios';
 
@@ -16,7 +19,9 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
   const [settings, setSettings] = useState({
     filterRange: [1, 40],
     notchFreq: 50,
-    analysisType: 'comprehensive'
+    analysisType: 'comprehensive',
+    applyICA: true,
+    customBands: ''
   });
   const [processing, setProcessing] = useState(false);
 
@@ -32,29 +37,40 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
     setSettings(prev => ({ ...prev, analysisType: event.target.value }));
   };
 
+  const handleApplyICAChange = (event) => {
+    setSettings(prev => ({ ...prev, applyICA: event.target.checked }));
+  };
+
+  const handleCustomBandsChange = (event) => {
+    setSettings(prev => ({ ...prev, customBands: event.target.value }));
+  };
+
   const handleAnalyze = async () => {
     setProcessing(true);
     try {
-      // In a real application, you would send the actual data and settings
       const response = await axios.post('http://localhost:5000/api/process', {
-        file_path: data.fileName,
+        file_path: data.filePath,
         settings: settings
       });
 
       if (response.data.status === 'success') {
         onAnalysisComplete(response.data);
+      } else {
+        console.error('Analysis failed:', response.data.message);
+        alert('Analysis failed: ' + response.data.message);
       }
     } catch (error) {
       console.error('Analysis failed:', error);
+      alert('An error occurred during analysis.');
     } finally {
       setProcessing(false);
     }
   };
 
   return (
-    <Box sx={{ p: 3, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1 }}>
+    <Box sx={{ p: 3, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, mt: 4 }}>
       <Grid container spacing={4}>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={6}>
           <Typography gutterBottom>
             Frequency Range (Hz)
           </Typography>
@@ -67,7 +83,7 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
           />
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={6}>
           <FormControl fullWidth>
             <InputLabel>Notch Frequency</InputLabel>
             <Select
@@ -77,11 +93,12 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
             >
               <MenuItem value={50}>50 Hz (Europe/Asia)</MenuItem>
               <MenuItem value={60}>60 Hz (Americas)</MenuItem>
+              <MenuItem value={0}>None</MenuItem>
             </Select>
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={6}>
           <FormControl fullWidth>
             <InputLabel>Analysis Type</InputLabel>
             <Select
@@ -96,12 +113,37 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
           </FormControl>
         </Grid>
 
+        {settings.analysisType === 'custom' && (
+          <Grid item xs={12} md={6}>
+            <TextField
+              label="Custom Frequency Bands (e.g., delta:1-4,theta:4-8)"
+              value={settings.customBands}
+              onChange={handleCustomBandsChange}
+              fullWidth
+            />
+          </Grid>
+        )}
+
+        <Grid item xs={12} md={6}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={settings.applyICA}
+                onChange={handleApplyICAChange}
+                color="primary"
+              />
+            }
+            label="Apply ICA for Artifact Removal"
+          />
+        </Grid>
+
         <Grid item xs={12}>
           <Button
             variant="contained"
             onClick={handleAnalyze}
             disabled={processing}
             fullWidth
+            size="large"
           >
             {processing ? 'Processing...' : 'Analyze Data'}
           </Button>
