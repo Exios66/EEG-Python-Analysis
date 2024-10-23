@@ -1,22 +1,25 @@
 import React from 'react';
-import { Box, Paper, Tab, Tabs } from '@mui/material';
-import { Line } from 'react-chartjs-2';
+import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
 } from 'chart.js';
+import 'chartjs-plugin-colorschemes';
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -32,14 +35,18 @@ const VisualizationPanel = ({ results }) => {
   const renderBandPowers = () => {
     if (!results?.features?.band_powers) return null;
 
+    const bandPowers = results.features.band_powers;
+    const channels = results.features.channels || [];
+
+    const datasets = channels.map((channel, idx) => ({
+      label: channel,
+      data: Object.keys(bandPowers).map(band => bandPowers[band][idx]),
+      backgroundColor: `rgba(${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, ${Math.floor(Math.random()*255)}, 0.5)`,
+    }));
+
     const data = {
-      labels: Object.keys(results.features.band_powers),
-      datasets: [{
-        label: 'Band Powers',
-        data: Object.values(results.features.band_powers).map(v => v[0]),
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      }]
+      labels: Object.keys(bandPowers),
+      datasets: datasets
     };
 
     const options = {
@@ -47,17 +54,21 @@ const VisualizationPanel = ({ results }) => {
       plugins: {
         legend: {
           position: 'top',
+          display: true,
         },
         title: {
           display: true,
-          text: 'EEG Band Powers'
+          text: 'EEG Band Powers per Channel'
+        },
+        colorschemes: {
+          scheme: 'brewer.Paired12'
         }
       }
     };
 
     return (
       <Box sx={{ height: 400 }}>
-        <Line data={data} options={options} />
+        <Bar data={data} options={options} />
       </Box>
     );
   };
@@ -65,14 +76,18 @@ const VisualizationPanel = ({ results }) => {
   const renderTemporalFeatures = () => {
     if (!results?.features?.temporal) return null;
 
+    const temporalFeatures = results.features.temporal;
+    const channels = results.features.channels || [];
+
     const data = {
-      labels: Object.keys(results.features.temporal),
-      datasets: [{
-        label: 'Temporal Features',
-        data: Object.values(results.features.temporal).map(v => v[0]),
-        borderColor: 'rgb(153, 102, 255)',
-        tension: 0.1
-      }]
+      labels: channels,
+      datasets: Object.keys(temporalFeatures).map((feature, idx) => ({
+        label: feature,
+        data: temporalFeatures[feature],
+        borderColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
+        backgroundColor: `hsla(${(idx * 60) % 360}, 70%, 50%, 0.5)`,
+        tension: 0.1,
+      }))
     };
 
     const options = {
@@ -80,11 +95,12 @@ const VisualizationPanel = ({ results }) => {
       plugins: {
         legend: {
           position: 'top',
+          display: true,
         },
         title: {
           display: true,
-          text: 'Temporal Features'
-        }
+          text: 'Temporal Features per Channel'
+        },
       }
     };
 
@@ -95,14 +111,55 @@ const VisualizationPanel = ({ results }) => {
     );
   };
 
+  const renderConnectivityMatrix = () => {
+    if (!results?.features?.connectivity) return null;
+
+    const connectivity = results.features.connectivity;
+    const channels = results.features.channels || [];
+    const data = {
+      labels: channels,
+      datasets: channels.map((channel, idx) => ({
+        label: channel,
+        data: connectivity[idx],
+        backgroundColor: `hsla(${(idx * 30) % 360}, 70%, 50%, 0.5)`,
+      }))
+    };
+
+    const options = {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: 'Channel Connectivity Matrix'
+        },
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+        },
+      },
+    };
+
+    return (
+      <Box sx={{ height: 400, overflowX: 'auto' }}>
+        <Bar data={data} options={options} />
+      </Box>
+    );
+  };
+
   return (
-    <Paper sx={{ width: '100%' }}>
+    <Paper sx={{ width: '100%', mt: 4 }}>
       <Tabs
         value={selectedTab}
         onChange={handleTabChange}
         indicatorColor="primary"
         textColor="primary"
         centered
+        variant="fullWidth"
       >
         <Tab label="Band Powers" />
         <Tab label="Temporal Features" />
@@ -112,11 +169,7 @@ const VisualizationPanel = ({ results }) => {
       <Box sx={{ p: 3 }}>
         {selectedTab === 0 && renderBandPowers()}
         {selectedTab === 1 && renderTemporalFeatures()}
-        {selectedTab === 2 && (
-          <Box sx={{ height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            Connectivity visualization coming soon...
-          </Box>
-        )}
+        {selectedTab === 2 && renderConnectivityMatrix()}
       </Box>
     </Paper>
   );
