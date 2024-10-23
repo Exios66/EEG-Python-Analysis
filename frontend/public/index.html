@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
     <!-- Meta Tags -->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="EEG Analysis and Visualization Platform" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="EEG Analysis and Visualization Platform">
     <title>EEG Analysis Platform</title>
     <!-- Styles -->
     <style>
@@ -289,9 +290,9 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#about" class="nav-link">About</a>
             <a href="#" class="nav-link">Documentation</a>
-            <a href="https://github.com/your-repo" class="nav-link" target="_blank">Repository</a>
-            <a href="https://notion.so/your-lab" class="nav-link" target="_blank">Lab Homepage</a>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <a href="https://github.com/your-repo" class="nav-link" target="_blank" rel="noopener noreferrer">Repository</a>
+            <a href="https://notion.so/your-lab" class="nav-link" target="_blank" rel="noopener noreferrer">Lab Homepage</a>
+            <button type="button" class="theme-toggle" onclick="toggleTheme()">🌓</button>
         </div>
     </nav>
 
@@ -329,12 +330,46 @@
     <!-- About Section -->
     <section class="about-section" id="about">
         <h2 class="about-title">About Us</h2>
-        <p class="about-content">
-            We are a dedicated team of neuroscientists and engineers committed to advancing EEG data analysis.
-            Our platform leverages cutting-edge technology to provide researchers and clinicians with the tools they need
-            to unlock the full potential of EEG data.
-        </p>
+        <div class="about-content">
+            <p>
+                We are a dedicated team of neuroscientists and engineers committed to advancing EEG data analysis.
+                Our platform leverages cutting-edge technology to provide researchers and clinicians with the tools they need
+                to unlock the full potential of EEG data.
+            </p>
+            <div class="expandable-content">
+                <h3>Our Mission</h3>
+                <p>
+                    Our mission is to democratize EEG analysis by providing an accessible, powerful, and user-friendly platform
+                    that integrates seamlessly with existing research workflows.
+                </p>
+                <h3>Technology Stack</h3>
+                <p>
+                    We utilize state-of-the-art technologies including machine learning algorithms, cloud computing, and
+                    advanced visualization techniques to process and interpret complex EEG data.
+                </p>
+                <h3>Integrations</h3>
+                <ul>
+                    <li>Compatible with major EEG hardware manufacturers</li>
+                    <li>Seamless integration with popular research tools like MATLAB and Python</li>
+                    <li>Export capabilities to various formats for further analysis</li>
+                </ul>
+            </div>
+            <button class="expand-button" onclick="toggleExpand()">Learn More</button>
+        </div>
     </section>
+    <script>
+        function toggleExpand() {
+            const content = document.querySelector('.expandable-content');
+            const button = document.querySelector('.expand-button');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                button.textContent = 'Show Less';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'Learn More';
+            }
+        }
+    </script>
 
     <!-- Upload Section -->
     <section class="upload-section" id="upload">
@@ -342,7 +377,8 @@
         <div class="upload-section">
             <div class="file-upload">
                 <div class="file-input-wrapper" id="dropZone">
-                    <input type="file" class="file-input" id="fileInput" accept=".eeg,.edf,.bdf,.gdf,.set" multiple />
+                    <label for="fileInput" class="visually-hidden">Upload EEG files</label>
+                    <input type="file" class="file-input" id="fileInput" accept=".eeg,.edf,.bdf,.gdf,.set" multiple aria-label="Upload EEG files" />
                     <div class="upload-icon">📁</div>
                     <div class="upload-text">
                         <strong>Drop your EEG files here</strong>
@@ -357,12 +393,61 @@
                 <div class="file-list" id="fileList"></div>
             </div>
         </div>
+        <div class="integrations-section">
+            <h3>Available Integrations</h3>
+            <div class="integration-list" id="integrationList"></div>
+        </div>
     </section>
+
+    <script>
+        // Dynamically populate integrations
+        const integrations = [
+            { name: 'MATLAB', icon: '🧮' },
+            { name: 'Python', icon: '🐍' },
+            { name: 'R', icon: '📊' },
+            { name: 'NeuroExplorer', icon: '🧠' },
+            { name: 'EEGLAB', icon: '🔬' }
+        ];
+
+        const integrationList = document.getElementById('integrationList');
+        integrations.forEach(integration => {
+            const integrationItem = document.createElement('div');
+            integrationItem.className = 'integration-item';
+            integrationItem.innerHTML = `
+                <span class="integration-icon">${integration.icon}</span>
+                <span class="integration-name">${integration.name}</span>
+            `;
+            integrationList.appendChild(integrationItem);
+        });
+    </script>
 
     <!-- Footer -->
     <footer class="footer">
-        &copy; 2023 EEG Analysis Platform. All rights reserved.
+        <div class="footer-content">
+            <div class="footer-copyright">
+                &copy; 2023 EEG Analysis Platform. All rights reserved.
+            </div>
+            <div class="footer-integrations">
+                <h4>Integrations:</h4>
+                <ul id="footerIntegrationList"></ul>
+            </div>
+            <div class="footer-github">
+                <a href="https://github.com/Exios66" target="_blank" rel="noopener noreferrer">
+                    GitHub: Exios66
+                </a>
+            </div>
+        </div>
     </footer>
+
+    <script>
+        // Populate footer integrations
+        const footerIntegrationList = document.getElementById('footerIntegrationList');
+        integrations.forEach(integration => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${integration.icon} ${integration.name}`;
+            footerIntegrationList.appendChild(listItem);
+        });
+    </script>
 
     <!-- Scripts -->
     <script>
@@ -478,6 +563,77 @@
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.classList.add(`${savedTheme}-theme`);
+        });
+
+        // Dynamically populate integrations
+        function populateIntegrations() {
+            const integrations = [
+                { name: 'MATLAB', icon: '🧮', url: 'https://www.mathworks.com/products/matlab.html' },
+                { name: 'Python', icon: '🐍', url: 'https://www.python.org/' },
+                { name: 'R', icon: '📊', url: 'https://www.r-project.org/' },
+                { name: 'NeuroExplorer', icon: '🧠', url: 'https://www.neuroexplorer.com/' },
+                { name: 'EEGLAB', icon: '🔬', url: 'https://sccn.ucsd.edu/eeglab/index.php' }
+            ];
+
+            const integrationList = document.getElementById('integrationList');
+            const footerIntegrationList = document.getElementById('footerIntegrationList');
+            
+            integrations.forEach(integration => {
+                // Populate main integration list
+                const integrationItem = document.createElement('div');
+                integrationItem.className = 'integration-item';
+                integrationItem.innerHTML = `
+                    <a href="${integration.url}" target="_blank" rel="noopener noreferrer">
+                        <span class="integration-icon">${integration.icon}</span>
+                        <span class="integration-name">${integration.name}</span>
+                    </a>
+                `;
+                integrationList.appendChild(integrationItem);
+
+                // Populate footer integration list
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <a href="${integration.url}" target="_blank" rel="noopener noreferrer">
+                        ${integration.icon} ${integration.name}
+                    </a>
+                `;
+                footerIntegrationList.appendChild(listItem);
+            });
+        }
+
+        // GitHub profile information
+        const githubUsername = 'Exios66';
+        const githubProfileUrl = `https://github.com/${githubUsername}`;
+        const githubApiUrl = `https://api.github.com/users/${githubUsername}`;
+
+        function updateGitHubInfo() {
+            const githubLink = document.querySelector('.footer-github a');
+            githubLink.href = githubProfileUrl;
+            githubLink.textContent = `GitHub: ${githubUsername}`;
+
+            // Add GitHub profile badge
+            fetch(githubApiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const badgeContainer = document.createElement('div');
+                    badgeContainer.className = 'github-badge';
+                    badgeContainer.innerHTML = `
+                        <img src="${data.avatar_url}" alt="${githubUsername}" width="50" height="50">
+                        <div>
+                            <strong>${data.name || githubUsername}</strong>
+                            <p>${data.bio || ''}</p>
+                            <p>Followers: ${data.followers} | Repos: ${data.public_repos}</p>
+                        </div>
+                    `;
+                    document.querySelector('.footer-github').appendChild(badgeContainer);
+                })
+                .catch(error => console.error('Error fetching GitHub data:', error));
+        }
+
+        // Call functions when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            populateIntegrations();
+            updateGitHubInfo();
         });
     </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
