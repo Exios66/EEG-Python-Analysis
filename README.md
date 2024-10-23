@@ -128,6 +128,8 @@ The backend provides the following REST API endpoints:
   - Parameters:
     - file_path: Path to the EEG data file
     - settings: Processing parameters
+  - Returns:
+    - JSON object containing the analysis results
 
 ## Contributing
 
@@ -150,3 +152,5 @@ For support and questions, please open an issue in the GitHub repository.
 - MNE Python for EEG processing capabilities
 - React for the frontend framework
 - Chart.js for visualization components
+- Flask for the backend server
+- Material-UI for the frontend components

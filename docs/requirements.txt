@@ -1,0 +1,39 @@
+# Install all requirements in the docs subfolder
+-r ../requirements.txt
+
+# Additional frontend-specific requirements
+# Core data processing
+numpy>=1.21.0
+pandas>=1.3.0
+scipy>=1.7.0
+
+# Machine learning
+scikit-learn>=0.24.0
+
+# EEG processing
+mne>=0.23.0
+
+# Web framework and API
+flask>=2.0.0
+flask-cors>=3.0.0
+flask-limiter>=2.0.0
+flask-jwt-extended>=4.0.0
+werkzeug>=2.0.0
+
+# Monitoring and metrics
+prometheus-client>=0.11.0
+psutil>=5.8.0
+
+# Data formats and serialization
+pyyaml>=5.4.0
+joblib>=1.0.0
+
+# Caching
+redis>=3.5.0
+
+# Visualization
+matplotlib>=3.4.0
+
+# Documentation
+# Install Sphinx and all extensions
+sphinx>=4.0.0 sphinx-rtd-theme>=0.5.0 sphinx-autodoc-typehints>=1.12.0 sphinxcontrib-httpdomain>=1.8.0 sphinx sphinx-rtd-theme sphinx-autobuild sphinxcontrib-napoleon sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-htmlhelp sphinxcontrib-jsmath sphinxcontrib-qthelp sphinxcontrib-serializinghtml
