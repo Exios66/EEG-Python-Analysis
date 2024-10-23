@@ -13,6 +13,7 @@ import {
   Legend
 } from 'chart.js/auto';
 import { getRandomColor } from '../utils/colorUtils';
+import { useThemeColors } from '../hooks/useThemeColors';
 
 ChartJS.register(
   CategoryScale,
@@ -27,6 +28,7 @@ ChartJS.register(
 
 const VisualizationPanel = ({ results }) => {
   const [selectedTab, setSelectedTab] = React.useState(0);
+  const { backgroundColor, textColor, accentColor } = useThemeColors();
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);

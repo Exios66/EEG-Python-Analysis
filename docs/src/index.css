@@ -7,7 +7,7 @@ body {
         sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    color: var(--text-light);
+    color: var(--dynamic-text-color);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s, color 0.3s;
@@ -22,7 +22,7 @@ code {
 :root {
     --primary-light: #ffffff;
     --secondary-light: #f0f2f5;
-    --text-light: #2d3436;
+    --text-light: var(--dynamic-text-color);
     --accent-light: #1e90ff;
     --border-light: #dfe6e9;
     --success-light: #00b894;
@@ -30,11 +30,39 @@ code {
 
     --primary-dark: #2d3436;
     --secondary-dark: #1e272e;
-    --text-dark: #dfe6e9;
+    --text-dark: var(--dynamic-text-color);
     --accent-dark: #1e90ff;
     --border-dark: #4a4a4a;
     --success-dark: #00cec9;
     --error-dark: #ff7675;
+
+    --background-color: var(--primary-light);
+    --text-color: var(--text-light);
+}
+
+/* Dark theme colors */
+body.dark-theme {
+    --background-color: var(--primary-dark);
+    --text-color: var(--text-dark);
+}
+
+/* Calculate dynamic text color based on background */
+* {
+    --background-color-r: 255;
+    --background-color-g: 255;
+    --background-color-b: 255;
+    --dynamic-text-color: calc((
+        (
+            (var(--background-color-r, 255) * 299) +
+            (var(--background-color-g, 255) * 587) +
+            (var(--background-color-b, 255) * 114)
+        ) / 1000
+    ) - 128) * -1000;
+}
+
+/* Apply dynamic text color to all text elements */
+body, h1, h2, h3, h4, h5, h6, p, span, a, li {
+    color: var(--dynamic-text-color);
 }
 
 /* Global Styles */

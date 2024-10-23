@@ -1,6 +1,14 @@
 # EEG Analysis and Visualization Platform
 
-A comprehensive platform for EEG data analysis and visualization, combining Python-based processing with a React-based frontend interface.
+![GitHub Pages](https://github.com/Exios66/EEG-Python-Analysis/actions/workflows/pages/pages-build-deployment/badge.svg)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Node.js](https://img.shields.io/badge/node-14%2B-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/react-17.0%2B-61DAFB.svg?logo=react)](https://reactjs.org/)
+[![Flask](https://img.shields.io/badge/flask-2.0%2B-000000.svg?logo=flask)](https://flask.palletsprojects.com/)
+[![MNE](https://img.shields.io/badge/MNE-Python-blue.svg)](https://mne.tools/stable/index.html)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 ## Features
 
@@ -23,12 +31,14 @@ A comprehensive platform for EEG data analysis and visualization, combining Pyth
 ### Backend Setup
 
 1. Create a Python virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 2. Install Python dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -36,11 +46,13 @@ pip install -r requirements.txt
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
+
 ```bash
 cd frontend
 ```
 
 2. Install Node.js dependencies:
+
 ```bash
 npm install
 ```
@@ -50,30 +62,34 @@ npm install
 ### Starting the Backend Server
 
 1. Activate the Python virtual environment:
+
 ```bash
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 2. Start the Flask server:
+
 ```bash
 python EEG.py
 ```
 
-The backend server will start on http://localhost:5000
+The backend server will start on <http://localhost:5000>
 
 ### Starting the Frontend Application
 
 1. In a new terminal, navigate to the frontend directory:
+
 ```bash
 cd frontend
 ```
 
 2. Start the development server:
+
 ```bash
 npm start
 ```
 
-The frontend application will start on http://localhost:3000
+The frontend application will start on <http://localhost:3000>
 
 ## Analysis Pipeline
 
