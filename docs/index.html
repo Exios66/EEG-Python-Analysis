@@ -290,8 +290,8 @@
             <a href="#features" class="nav-link">Features</a>
             <a href="#about" class="nav-link">About</a>
             <a href="#" class="nav-link">Documentation</a>
-            <a href="https://github.com/your-repo" class="nav-link" target="_blank" rel="noopener noreferrer">Repository</a>
-            <a href="https://notion.so/your-lab" class="nav-link" target="_blank" rel="noopener noreferrer">Lab Homepage</a>
+            <a href="https://github.com/Exios66/EEG-Python-Analysis" class="nav-link" target="_blank" rel="noopener noreferrer">Repository</a>
+            <a href="https://morningstar-developments.super.site/" class="nav-link" target="_blank" rel="noopener noreferrer">Lab Homepage</a>
             <button type="button" class="theme-toggle" onclick="toggleTheme()">🌓</button>
         </div>
     </nav>
@@ -431,9 +431,12 @@
                 <h4>Integrations:</h4>
                 <ul id="footerIntegrationList"></ul>
             </div>
-            <div class="footer-github">
-                <a href="https://github.com/Exios66" target="_blank" rel="noopener noreferrer">
-                    GitHub: Exios66
+            <div class="footer-links">
+                <a href="https://github.com/Exios66/EEG-Python-Analysis" target="_blank" rel="noopener noreferrer">
+                    GitHub Repository
+                </a>
+                <a href="https://morningstar-developments.super.site/" target="_blank" rel="noopener noreferrer">
+                    Lab Homepage
                 </a>
             </div>
         </div>
@@ -545,34 +548,126 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        uploadButton.addEventListener('click', function() {
-            // Here you would typically handle the file upload to your backend
-            // For now, we'll just simulate the process
-            uploadButton.textContent = 'Processing...';
-            uploadButton.disabled = true;
+        uploadButton.addEventListener('click', async function() {
+            try {
+                // Disable button and update UI
+                uploadButton.textContent = 'Processing...';
+                uploadButton.disabled = true;
+                
+                // Get selected files
+                const files = fileInput.files;
+                if (!files || files.length === 0) {
+                    throw new Error('No files selected');
+                }
 
-            // Simulate processing delay
-            setTimeout(() => {
+                // Create FormData and append files
+                const formData = new FormData();
+                [...files].forEach((file, index) => {
+                    formData.append(`file${index}`, file);
+                });
+
+                // Send files to backend
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Upload failed: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                // Show success message with details
+                const successMessage = document.createElement('div');
+                successMessage.className = 'alert alert-success';
+                successMessage.innerHTML = `
+                    <h4>Upload Successful!</h4>
+                    <p>Processed ${files.length} file(s)</p>
+                    <p>Job ID: ${result.jobId}</p>
+                    <p>Processing time: ${result.processingTime}ms</p>
+                `;
+                document.querySelector('.upload-container').appendChild(successMessage);
+
+                // Clear file input
+                fileInput.value = '';
+                fileList.innerHTML = '';
+                fileInfo.textContent = '';
+
+            } catch (error) {
+                // Show error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-error';
+                errorMessage.textContent = `Error: ${error.message}`;
+                document.querySelector('.upload-container').appendChild(errorMessage);
+                
+                console.error('Upload error:', error);
+                
+            } finally {
+                // Reset button state
                 uploadButton.textContent = 'Analyze EEG Data';
                 uploadButton.disabled = false;
-                alert('Files processed successfully! (This is a simulation)');
-            }, 2000);
+            }
         });
 
-        // Check for saved theme preference
+        // Theme management
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.classList.add(`${savedTheme}-theme`);
+            
+            // Set initial theme toggle state and automatically switch to dark theme
+            document.body.classList.remove('light-theme');
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.checked = savedTheme === 'dark';
+            }
         });
 
-        // Dynamically populate integrations
+        // Integration configuration and management
         function populateIntegrations() {
             const integrations = [
-                { name: 'MATLAB', icon: '🧮', url: 'https://www.mathworks.com/products/matlab.html' },
-                { name: 'Python', icon: '🐍', url: 'https://www.python.org/' },
-                { name: 'R', icon: '📊', url: 'https://www.r-project.org/' },
-                { name: 'NeuroExplorer', icon: '🧠', url: 'https://www.neuroexplorer.com/' },
-                { name: 'EEGLAB', icon: '🔬', url: 'https://sccn.ucsd.edu/eeglab/index.php' }
+                {
+                    name: 'MATLAB',
+                    icon: '🧮',
+                    url: 'https://www.mathworks.com/products/matlab.html',
+                    description: 'Industry-standard numerical computing platform',
+                    version: 'R2023b',
+                    features: ['Signal Processing', 'Statistics', 'Machine Learning']
+                },
+                {
+                    name: 'Python',
+                    icon: '🐍',
+                    url: 'https://www.python.org/',
+                    description: 'General-purpose programming language',
+                    version: '3.11+',
+                    features: ['MNE', 'NumPy', 'SciPy']
+                },
+                {
+                    name: 'R',
+                    icon: '📊',
+                    url: 'https://www.r-project.org/',
+                    description: 'Statistical computing environment',
+                    version: '4.3+',
+                    features: ['eegkit', 'signal']
+                },
+                {
+                    name: 'NeuroExplorer',
+                    icon: '🧠',
+                    url: 'https://www.neuroexplorer.com/',
+                    description: 'Professional neurophysiological data analysis',
+                    version: '5.0+',
+                    features: ['Spike Analysis', 'Time-Frequency']
+                },
+                {
+                    name: 'EEGLAB',
+                    icon: '🔬',
+                    url: 'https://sccn.ucsd.edu/eeglab/index.php',
+                    description: 'Interactive EEG/MEG processing platform',
+                    version: '2023.1',
+                    features: ['ICA', 'Time/Frequency', 'Source Localization']
+                }
             ];
 
             const integrationList = document.getElementById('integrationList');
@@ -604,12 +699,13 @@
         // GitHub profile information
         const githubUsername = 'Exios66';
         const githubProfileUrl = `https://github.com/${githubUsername}`;
+        const githubRepoUrl = 'https://github.com/Exios66/EEG-Python-Analysis';
         const githubApiUrl = `https://api.github.com/users/${githubUsername}`;
 
         function updateGitHubInfo() {
             const githubLink = document.querySelector('.footer-github a');
-            githubLink.href = githubProfileUrl;
-            githubLink.textContent = `GitHub: ${githubUsername}`;
+            githubLink.href = githubRepoUrl;
+            githubLink.textContent = `GitHub: ${githubUsername}/EEG-Python-Analysis`;
 
             // Add GitHub profile badge
             fetch(githubApiUrl)
@@ -630,10 +726,18 @@
                 .catch(error => console.error('Error fetching GitHub data:', error));
         }
 
+        function updateLinks() {
+            const labHomepageLinks = document.querySelectorAll('a[href="https://morningstar-developments.super.site/"]');
+            labHomepageLinks.forEach(link => {
+                link.textContent = 'Morningstar Developments';
+            });
+        }
+
         // Call functions when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             populateIntegrations();
             updateGitHubInfo();
+            updateLinks(); // Call the new function
         });
     </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>

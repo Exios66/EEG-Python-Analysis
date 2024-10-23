@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -11,57 +11,165 @@ import {
   Grid,
   TextField,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  CircularProgress,
+  Alert,
+  Tooltip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
+import { Help as HelpIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import axios from 'axios';
+import { useSnackbar } from 'notistack';
+import { debounce } from 'lodash';
+
+const DEFAULT_SETTINGS = {
+  filterRange: [1, 40],
+  notchFreq: 50,
+  analysisType: 'comprehensive',
+  applyICA: true,
+  customBands: '',
+  advancedSettings: {
+    icaComponents: 20,
+    epochLength: 2,
+    overlapPercentage: 50,
+    baselineCorrection: true,
+    artifactRejectionThreshold: 100,
+    interpolateChannels: true,
+    filterOrder: 4,
+    filterType: 'butterworth'
+  }
+};
+
+const ANALYSIS_TYPES = {
+  comprehensive: {
+    label: 'Comprehensive',
+    description: 'Full analysis including time-frequency decomposition, ERPs, and connectivity metrics'
+  },
+  quick: {
+    label: 'Quick Analysis',
+    description: 'Basic preprocessing and power spectrum analysis'
+  },
+  custom: {
+    label: 'Custom',
+    description: 'Specify custom frequency bands and analysis parameters'
+  }
+};
 
 const AnalysisControls = ({ data, onAnalysisComplete }) => {
-  const [settings, setSettings] = useState({
-    filterRange: [1, 40],
-    notchFreq: 50,
-    analysisType: 'comprehensive',
-    applyICA: true,
-    customBands: ''
-  });
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
+  const { enqueueSnackbar } = useSnackbar();
 
-  const handleFilterChange = (event, newValue) => {
-    setSettings(prev => ({ ...prev, filterRange: newValue }));
-  };
+  useEffect(() => {
+    // Load saved settings from localStorage
+    const savedSettings = localStorage.getItem('analysisSettings');
+    if (savedSettings) {
+      try {
+        setSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error('Failed to load saved settings:', e);
+      }
+    }
+  }, []);
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('analysisSettings', JSON.stringify(settings));
+  }, [settings]);
+
+  const validateSettings = useCallback(() => {
+    const errors = {};
+    
+    if (settings.filterRange[0] >= settings.filterRange[1]) {
+      errors.filterRange = 'Lower frequency must be less than upper frequency';
+    }
+
+    if (settings.analysisType === 'custom' && !settings.customBands) {
+      errors.customBands = 'Custom frequency bands are required';
+    }
+
+    if (settings.customBands) {
+      const bandsPattern = /^(\w+:\d+-\d+,)*(\w+:\d+-\d+)$/;
+      if (!bandsPattern.test(settings.customBands)) {
+        errors.customBands = 'Invalid format. Use: band:start-end,band:start-end';
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [settings]);
+
+  const handleFilterChange = useCallback(
+    debounce((event, newValue) => {
+      setSettings(prev => ({ ...prev, filterRange: newValue }));
+    }, 100),
+    []
+  );
 
   const handleNotchFreqChange = (event) => {
     setSettings(prev => ({ ...prev, notchFreq: event.target.value }));
   };
 
   const handleAnalysisTypeChange = (event) => {
-    setSettings(prev => ({ ...prev, analysisType: event.target.value }));
+    setSettings(prev => ({
+      ...prev,
+      analysisType: event.target.value,
+      customBands: event.target.value === 'custom' ? prev.customBands : ''
+    }));
   };
 
-  const handleApplyICAChange = (event) => {
-    setSettings(prev => ({ ...prev, applyICA: event.target.checked }));
-  };
-
-  const handleCustomBandsChange = (event) => {
-    setSettings(prev => ({ ...prev, customBands: event.target.value }));
+  const handleAdvancedSettingChange = (setting, value) => {
+    setSettings(prev => ({
+      ...prev,
+      advancedSettings: {
+        ...prev.advancedSettings,
+        [setting]: value
+      }
+    }));
   };
 
   const handleAnalyze = async () => {
+    if (!validateSettings()) {
+      enqueueSnackbar('Please correct the validation errors', { variant: 'error' });
+      return;
+    }
+
     setProcessing(true);
+    setError(null);
+
     try {
-      const response = await axios.post('http://localhost:5000/api/process', {
+      const response = await axios.post('/api/process', {
         file_path: data.filePath,
         settings: settings
+      }, {
+        timeout: 300000, // 5 minute timeout
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          // Update progress if needed
+        }
       });
 
       if (response.data.status === 'success') {
+        enqueueSnackbar('Analysis completed successfully', { variant: 'success' });
         onAnalysisComplete(response.data);
       } else {
-        console.error('Analysis failed:', response.data.message);
-        alert('Analysis failed: ' + response.data.message);
+        throw new Error(response.data.message || 'Analysis failed');
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'An unexpected error occurred';
+      setError(errorMessage);
+      enqueueSnackbar(errorMessage, { variant: 'error' });
       console.error('Analysis failed:', error);
-      alert('An error occurred during analysis.');
     } finally {
       setProcessing(false);
     }
@@ -69,10 +177,21 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
 
   return (
     <Box sx={{ p: 3, border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: 1, mt: 4 }}>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <Typography gutterBottom>
             Frequency Range (Hz)
+            <Tooltip title="Set the frequency range for bandpass filtering">
+              <IconButton size="small" sx={{ ml: 1 }}>
+                <HelpIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Typography>
           <Slider
             value={settings.filterRange}
@@ -80,6 +199,13 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
             valueLabelDisplay="auto"
             min={0}
             max={100}
+            marks={[
+              { value: 0, label: '0Hz' },
+              { value: 50, label: '50Hz' },
+              { value: 100, label: '100Hz' }
+            ]}
+            error={!!validationErrors.filterRange}
+            helperText={validationErrors.filterRange}
           />
         </Grid>
 
@@ -106,9 +232,13 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
               onChange={handleAnalysisTypeChange}
               label="Analysis Type"
             >
-              <MenuItem value="comprehensive">Comprehensive</MenuItem>
-              <MenuItem value="quick">Quick Analysis</MenuItem>
-              <MenuItem value="custom">Custom</MenuItem>
+              {Object.entries(ANALYSIS_TYPES).map(([key, { label, description }]) => (
+                <MenuItem key={key} value={key}>
+                  <Tooltip title={description}>
+                    <span>{label}</span>
+                  </Tooltip>
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -116,10 +246,12 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
         {settings.analysisType === 'custom' && (
           <Grid item xs={12} md={6}>
             <TextField
-              label="Custom Frequency Bands (e.g., delta:1-4,theta:4-8)"
+              label="Custom Frequency Bands"
               value={settings.customBands}
-              onChange={handleCustomBandsChange}
+              onChange={(e) => setSettings(prev => ({ ...prev, customBands: e.target.value }))}
               fullWidth
+              error={!!validationErrors.customBands}
+              helperText={validationErrors.customBands || 'Format: delta:1-4,theta:4-8,alpha:8-13'}
             />
           </Grid>
         )}
@@ -129,26 +261,76 @@ const AnalysisControls = ({ data, onAnalysisComplete }) => {
             control={
               <Checkbox
                 checked={settings.applyICA}
-                onChange={handleApplyICAChange}
+                onChange={(e) => setSettings(prev => ({ ...prev, applyICA: e.target.checked }))}
                 color="primary"
               />
             }
-            label="Apply ICA for Artifact Removal"
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                Apply ICA for Artifact Removal
+                <Tooltip title="Independent Component Analysis for removing eye blinks and other artifacts">
+                  <IconButton size="small" sx={{ ml: 1 }}>
+                    <HelpIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            }
           />
         </Grid>
 
         <Grid item xs={12}>
-          <Button
-            variant="contained"
-            onClick={handleAnalyze}
-            disabled={processing}
-            fullWidth
-            size="large"
-          >
-            {processing ? 'Processing...' : 'Analyze Data'}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="contained"
+              onClick={handleAnalyze}
+              disabled={processing}
+              fullWidth
+              size="large"
+              startIcon={processing && <CircularProgress size={20} />}
+            >
+              {processing ? 'Processing...' : 'Analyze Data'}
+            </Button>
+            <IconButton onClick={() => setShowAdvanced(true)}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
         </Grid>
       </Grid>
+
+      <Dialog open={showAdvanced} onClose={() => setShowAdvanced(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Advanced Settings</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            {/* Advanced settings controls */}
+            {Object.entries(settings.advancedSettings).map(([key, value]) => (
+              <Grid item xs={12} md={6} key={key}>
+                {typeof value === 'boolean' ? (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={value}
+                        onChange={(e) => handleAdvancedSettingChange(key, e.target.checked)}
+                      />
+                    }
+                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                    value={value}
+                    onChange={(e) => handleAdvancedSettingChange(key, Number(e.target.value))}
+                    type="number"
+                  />
+                )}
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowAdvanced(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
