@@ -10,194 +10,216 @@
 [![MNE](https://img.shields.io/badge/MNE-Python-blue.svg)](https://mne.tools/stable/index.html)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-## Features
+## EEG Visualization App
 
-- Advanced EEG data processing and analysis
-- Real-time visualization
-- Interactive analysis controls
-- Support for multiple EEG file formats
-- Comprehensive feature extraction
-- Statistical analysis capabilities
-- Modern web-based interface
+## Overview
 
-## System Requirements
+The EEG Visualization App is a comprehensive, user-friendly platform that integrates EEG data analysis with real-time visualization. It is designed to provide researchers, clinicians, and developers with an intuitive interface to preprocess, analyze, and visualize EEG data. This application leverages the power of Python, Node.js, React, and Flask to create a seamless and efficient workflow for EEG signal processing, offering both backend and frontend functionalities.
 
-- Python 3.8+
-- Node.js 14+
-- npm 6+
+### Key Technologies:
 
-## Installation
+	•	Python 3.8+: Used for backend data processing and EEG analysis.
+	•	Node.js 14+: Enables the modern frontend and backend integration with real-time functionality.
+	•	React 17.0+: Powers the dynamic and interactive user interface.
+	•	Flask 2.0+: Facilitates a lightweight and scalable backend server.
+	•	MNE-Python: A robust library for EEG processing, used for signal preprocessing, feature extraction, and artifact removal.
 
-### Backend Setup
+### Features
 
-1. Create a Python virtual environment:
+	•	Advanced EEG Data Processing: Seamlessly process large-scale EEG datasets with various analysis methods, including artifact removal and feature extraction.
+	•	Real-Time Data Visualization: View live updates as EEG data is processed, offering a real-time perspective on data trends and findings.
+	•	Interactive Analysis Controls: Adjust processing parameters and visual settings directly from the interface, allowing users to explore the data interactively.
+	•	Multi-Format EEG Support: Upload and analyze EEG data from diverse file formats, such as .edf, .fif, and .set.
+	•	Statistical Analysis: Generate statistical summaries, including spectral analysis and temporal features, to extract meaningful insights.
+	•	Web-Based Interface: A clean, responsive interface accessible through modern web browsers, requiring no additional software installations.
 
-```bash
+System Requirements
+
+The following components must be installed to run the EEG Visualization App:
+
+Backend Requirements:
+
+	•	Python: Version 3.8 or higher
+	•	Flask: Version 2.0 or higher
+	•	MNE-Python for EEG processing
+
+Frontend Requirements:
+
+	•	Node.js: Version 14 or higher
+	•	npm: Version 6 or higher
+	•	React: Version 17.0 or higher
+
+Additional Tools:
+
+	•	Modern web browser (Chrome, Firefox, Edge)
+
+Installation
+
+Follow these steps to install and configure both the backend and frontend components.
+
+Backend Setup
+
+	1.	Create a Python Virtual Environment:
+	•	A virtual environment isolates Python dependencies from the global environment, ensuring compatibility.
+
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-2. Install Python dependencies:
 
-```bash
+	2.	Install Python Dependencies:
+	•	Dependencies include Flask, MNE-Python, and other necessary libraries.
+
 pip install -r requirements.txt
-```
 
-### Frontend Setup
 
-1. Navigate to the frontend directory:
 
-```bash
+Frontend Setup
+
+	1.	Navigate to the Frontend Directory:
+	•	Move to the frontend directory to set up the web interface.
+
 cd frontend
-```
 
-2. Install Node.js dependencies:
 
-```bash
+	2.	Install Node.js Dependencies:
+	•	Install the required JavaScript libraries and packages for React.
+
 npm install
-```
 
-## Usage
 
-### Starting the Backend Server
 
-1. Activate the Python virtual environment:
+Usage
 
-```bash
+This section details how to run the application after setup.
+
+Starting the Backend Server
+
+	1.	Activate the Python Virtual Environment:
+	•	Ensure that the environment is active before starting the server.
+
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-2. Start the Flask server:
 
-```bash
+	2.	Run the Flask Backend:
+	•	This starts the server to handle EEG data processing requests.
+
 python EEG.py
-```
 
-The backend server will start on <http://localhost:5000>
+	•	The backend server will run on: http://localhost:5000
 
-### Starting the Frontend Application
+Starting the Frontend Application
 
-1. In a new terminal, navigate to the frontend directory:
+	1.	Open a New Terminal for the Frontend:
+	•	The frontend and backend should run in separate terminals.
 
-```bash
 cd frontend
-```
 
-2. Start the development server:
 
-```bash
+	2.	Start the React Development Server:
+
 npm start
-```
 
-The frontend application will start on <http://localhost:3000>
+	•	The frontend will be accessible via: http://localhost:3000
 
-## Analysis Pipeline
+Analysis Pipeline
 
-The platform implements a comprehensive EEG analysis pipeline:
+This section breaks down the EEG data analysis pipeline in the app:
 
-1. **Data Loading**
-   - Support for multiple EEG file formats (.edf, .fif, .set)
-   - Automatic format detection
-   - Data validation
+1. Data Loading:
 
-2. **Preprocessing**
-   - Bandpass filtering (configurable frequency range)
-   - Notch filtering for power line noise
-   - Bad channel detection and interpolation
-   - ICA-based artifact removal
+	•	Supports popular EEG formats such as .edf, .fif, and .set.
+	•	Automatically detects file format and validates data integrity before processing.
 
-3. **Feature Extraction**
-   - Spectral analysis (band powers)
-   - Temporal features
-   - Connectivity metrics
-   - Statistical measures
+2. Preprocessing:
 
-4. **Visualization**
-   - Raw signal plots
-   - Processed signal visualization
-   - Spectral analysis plots
-   - Interactive data exploration
-   - Real-time updates
+	•	Bandpass Filtering: Filters EEG signals within a configurable frequency range.
+	•	Notch Filtering: Removes power line noise (e.g., 50/60 Hz) to clean the signal.
+	•	Bad Channel Detection: Automatically detects bad channels and replaces them with interpolated data.
+	•	Artifact Removal with ICA: Uses Independent Component Analysis (ICA) to eliminate artifacts such as eye movements.
 
-## API Endpoints
+3. Feature Extraction:
 
-The backend provides the following REST API endpoints:
+	•	Spectral Analysis: Calculates band powers (e.g., alpha, beta, theta waves).
+	•	Temporal Features: Extracts time-domain characteristics from the EEG signals.
+	•	Connectivity Metrics: Computes metrics such as coherence to assess the connection between different brain regions.
+	•	Statistical Measures: Provides basic and advanced statistical summaries of the processed EEG data.
 
-- `POST /api/process`
-  - Process uploaded EEG data
-  - Parameters:
-    - file_path: Path to the EEG data file
-    - settings: Processing parameters
-  - Returns:
-    - JSON object containing the analysis results
+4. Visualization:
 
-## Contributing
+	•	Raw Signal Plots: Visualize raw EEG signals before and after preprocessing.
+	•	Spectral Analysis Plots: Graphically represent power spectral densities.
+	•	Interactive Exploration: Zoom, pan, and select specific time ranges or channels for closer analysis.
+	•	Real-Time Updates: See the EEG signal processing results updated in real-time.
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+### API Endpoints
 
-## License
+The backend exposes REST API endpoints for interacting with the app programmatically.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Endpoint: POST /api/process
 
-## Support
+	•	Description: Process uploaded EEG data and return the analysis results.
+	•	Request Parameters:
+	•	file_path: The path to the EEG file to be processed.
+	•	settings: A JSON object containing user-defined processing parameters (e.g., filter settings, feature extraction options).
+	•	Response:
+	•	A JSON object with the processed EEG data and feature extraction results.
 
-For support and questions, please open an issue in the GitHub repository.
+### Contributing
 
-## Acknowledgments
+We welcome contributions from the community! To contribute:
 
-- MNE Python for EEG processing capabilities
-- React for the frontend framework
-- Chart.js for visualization components
-- Flask for the backend server
-- Material-UI for the frontend components
+	1.	Fork the Repository:
+	•	Clone the repository to your GitHub account.
 
-## Prerequisites
+git clone https://github.com/Exios66/EEG-Python-Analysis.git
 
-- Node.js (v14 or later)
-- Python (v3.7 or later)
-- pip (Python package installer)
 
-## Setup
+	2.	Create a Feature Branch:
+	•	Work on a new feature or bug fix within a dedicated branch.
 
-1. Clone the repository:   ```
-   git clone https://github.com/Exios66/EEG-Python-Analysis.git
-   cd EEG-Python-Analysis   ```
+git checkout -b feature-name
 
-2. Set up the Python backend:   ```
-   pip install -r requirements.txt   ```
 
-3. Set up the React frontend:   ```
-   cd docs
-   npm install   ```
+	3.	Commit Your Changes:
+	•	Ensure your code is well-documented and tested.
 
-## Running the Application
+git commit -m "Add new feature"
 
-1. Start the Python backend:   ```
-   python EEG.py   ```
-   The backend will run on `http://localhost:5000`.
 
-2. In a new terminal, start the React frontend:   ```
-   cd docs
-   npm start   ```
-   The frontend will run on `http://localhost:3000`.
+	4.	Push to Your Branch:
 
-3. Open your browser and navigate to `http://localhost:3000` to view the application.
+git push origin feature-name
 
-## Development
 
-- The main Python script is `EEG.py`.
-- React components are in the `docs/src/components` directory.
-- The main React application is in `docs/src/App.js`.
+	5.	Create a Pull Request:
+	•	Submit a Pull Request for review. Include a detailed description of your changes.
 
-## Contributing
+### License
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+This project is licensed under the MIT License. For full details, see the LICENSE file.
 
-## License
+### Support
+
+For any questions or issues, please open an issue on the GitHub repository, and we will respond promptly.
+
+Acknowledgments
+
+We would like to thank the following libraries and frameworks that have been integral to the development of this project:
+
+	•	MNE Python: EEG processing library.
+	•	React: Frontend framework.
+	•	Chart.js: Visualization library.
+	•	Flask: Backend web framework.
+	•	Material-UI: Frontend component library for React.
+
+## Running Tests
+
+## Frontend Tests
+
+To ensure that the React components are functioning correctly, use the following command to run the test suite:
+
+      npm run test
+
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
